@@ -37,6 +37,7 @@ async function run() {
         const partCollection = client.db('tech-build').collection('parts');
         const userCollection = client.db('tech-build').collection('users');
         const reviewCollection = client.db('tech-build').collection('reviews');
+        const orderCollection = client.db('tech-build').collection('orders');
         //FOR PARTS
         app.get('/parts', async (req, res) => {
             const query = {};
@@ -44,6 +45,20 @@ async function run() {
             const parts = await cursor.toArray();
             res.send(parts);
         });
+
+        app.get('/parts/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const part = await partCollection.findOne(query);
+            res.send(part);
+        })
+
+        //FOR ORDERS
+        app.post('/orders', async (req, res) => {
+            const order = req.body;
+            const result = await orderCollection.insertOne(order);
+            return res.send({ success: true, result });
+        })
 
         //FOR REVIEWS
         app.get('/reviews', async (req, res) => {
@@ -53,6 +68,7 @@ async function run() {
             res.send(reviews);
         });
 
+        //FOR USERS
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
