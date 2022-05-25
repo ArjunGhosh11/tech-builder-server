@@ -58,11 +58,24 @@ async function run() {
             res.send(parts);
         });
 
+        app.post('/parts', async (req, res) => {
+            const part = req.body;
+            const result = await partCollection.insertOne(part);
+            return res.send({ success: true, result });
+        })
+
         app.get('/parts/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const part = await partCollection.findOne(query);
             res.send(part);
+        })
+
+        app.delete('/parts/:id', verifyJWT, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await partCollection.deleteOne(filter);
+            res.send(result);
         })
 
         //FOR ORDERS
@@ -71,12 +84,7 @@ async function run() {
             const result = await orderCollection.insertOne(order);
             return res.send({ success: true, result });
         })
-        // app.get('/orders', async (req, res) => {
-        //     const query = {};
-        //     const cursor = orderCollection.find(query);
-        //     const orders = await cursor.toArray();
-        //     res.send(orders);
-        // });
+
         app.get('/orders', verifyJWT, async (req, res) => {
             const customer = req.query.customer;
             let query;
