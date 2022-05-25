@@ -71,8 +71,31 @@ async function run() {
             const result = await orderCollection.insertOne(order);
             return res.send({ success: true, result });
         })
+        // app.get('/orders', async (req, res) => {
+        //     const query = {};
+        //     const cursor = orderCollection.find(query);
+        //     const orders = await cursor.toArray();
+        //     res.send(orders);
+        // });
+        app.get('/orders', verifyJWT, async (req, res) => {
+            const customer = req.query.customer;
+            let query;
+            if (customer) {
+                query = { customer: customer };
+            }
+            else {
+                query = {};
+            }
 
+            const orders = await orderCollection.find(query).toArray();
+            return res.send(orders);
+        });
         //FOR REVIEWS
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            return res.send({ success: true, result });
+        })
         app.get('/reviews', async (req, res) => {
             const query = {};
             const cursor = reviewCollection.find(query);
